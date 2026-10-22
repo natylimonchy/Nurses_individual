@@ -6,32 +6,36 @@ use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\JsonResponse;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\Routing\Attribute\Route;
+use App\Repository\NurseRepository;
 
 #[Route('/nurse')]
 class NurseController extends AbstractController
 {
-    // Datos estáticos (todavía sin base de datos)
-    private array $nurses = [
-        ['id' => 1, 'name' => 'Ana',   'user' => 'ana',   'password' => '1234'],
-        ['id' => 2, 'name' => 'Pedro', 'user' => 'pedro', 'password' => 'abcd'],
-        ['id' => 3, 'name' => 'Laura', 'user' => 'laura', 'password' => 'pass'],
-    ];
-
     #[Route('/login', name: 'nurse_login', methods: ['POST'])]
-    public function login(Request $request): JsonResponse
+    public function login(Request $request, NurseRepository $nurseRepository): JsonResponse
     {
-        // Leemos el JSON que nos envían
+        
         $data = json_decode($request->getContent(), true);
-        $user = $data['user'] ?? null;
-        $password = $data['password'] ?? null;
+        if (!is_array($data) || empty($data['user']) || empty($data['password'])) {
+            return $this->json([
+                'success' => false,
+                'message' => 'El usuario y la contraseña son obligatorios',
+            ], JsonResponse::HTTP_BAD_REQUEST);
+        }
+        
+        $nurse = $nurseRepository->findOneBy(['username' => $data['user']]);
 
-        // Buscamos si existe un enfermero con ese usuario y contraseña
-        foreach ($this->nurses as $nurse) {
-            if ($nurse['user'] === $user && $nurse['password'] === $password) {
-                return $this->json(true);
-            }
+
+        if ($nurse === null || $nurse->getPassword() !== $data['password']) {
+            return $this->json([
+                'success' => false,
+                'message' => 'Usuario o contraseña incorrectos',
+            ], JsonResponse::HTTP_UNAUTHORIZED);
         }
 
-        return $this->json(false, JsonResponse::HTTP_UNAUTHORIZED);
+         return $this->json([
+            'success' => true,
+            'message' => 'Login correcto',
+        ]);
     }
 }
