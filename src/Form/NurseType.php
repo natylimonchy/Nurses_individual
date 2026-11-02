@@ -27,6 +27,7 @@ class NurseType extends AbstractType
     {
         $resolver->setDefaults([
             'data_class' => Nurse::class,
+            'csrf_protection' => false,
         ]);
     }
 }
