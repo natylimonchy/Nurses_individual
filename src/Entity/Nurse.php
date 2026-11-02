@@ -4,36 +4,59 @@ namespace App\Entity;
 
 use App\Repository\NurseRepository;
 use Doctrine\ORM\Mapping as ORM;
+use Symfony\Component\Validator\Constraints as Assert;
 
 #[ORM\Entity(repositoryClass: NurseRepository::class)]
 class Nurse
 {
+
     #[ORM\Id]
     #[ORM\GeneratedValue]
     #[ORM\Column]
     private ?int $id = null;
 
+    #[Assert\NotBlank(message: 'El ID interno no puede estar vacío')]
+    #[Assert\Length(max: 20, maxMessage: 'El ID interno no puede tener más de 20 caracteres')]
     #[ORM\Column(length: 20)]
     private ?string $internalId = null;
 
+    #[Assert\NotBlank(message: 'El nombre no puede estar vacío')]
+    #[Assert\Length(max: 50, maxMessage: 'El nombre no puede tener más de 50 caracteres')]
+    #[Assert\Regex(pattern: '/^[\p{L} ]+$/u', message: 'El nombre solo puede contener letras y espacios')]
     #[ORM\Column(length: 50)]
     private ?string $firstName = null;
 
+    #[Assert\NotBlank(message: 'El apellido no puede estar vacío')]
+    #[Assert\Length(max: 50, maxMessage: 'El apellido no puede tener más de 50 caracteres')]
+    #[Assert\Regex(pattern: '/^[\p{L} ]+$/u', message: 'El apellido solo puede contener letras y espacios')]
     #[ORM\Column(length: 50)]
     private ?string $lastName = null;
 
+    #[Assert\NotBlank(message: 'El número de licencia no puede estar vacío')]
+    #[Assert\Length(max: 20, maxMessage: 'El número de licencia no puede tener más de 20 caracteres')]
+    #[Assert\Regex(pattern: '/^[A-Za-z0-9]+$/', message: 'El número de licencia solo puede contener letras y números')]
     #[ORM\Column(length: 20)]
     private ?string $licenseNumber = null;
 
+    #[Assert\NotBlank(message: 'El usuario no puede estar vacío')]
+    #[Assert\Length(max: 50, maxMessage: 'El usuario no puede tener más de 50 caracteres')]
+    #[Assert\Regex(pattern: '/^\S+$/', message: 'El usuario no puede contener espacios')]
     #[ORM\Column(length: 50)]
     private ?string $username = null;
 
+    #[Assert\NotBlank(message: 'La contraseña no puede estar vacía')]
+    #[Assert\Length(min: 8, max: 255, minMessage: 'La contraseña debe tener al menos 8 caracteres', maxMessage: 'La contraseña no puede tener más de 255 caracteres')]
     #[ORM\Column(length: 255)]
     private ?string $password = null;
 
+    #[Assert\NotBlank(message: 'El email no puede estar vacío')]
+    #[Assert\Email(message: 'El email no tiene un formato válido')]
+    #[Assert\Length(max: 100, maxMessage: 'El email no puede tener más de 100 caracteres')]
     #[ORM\Column(length: 100)]
     private ?string $email = null;
 
+    #[Assert\NotBlank(message: 'El turno no puede estar vacío')]
+    #[Assert\Choice(choices: ['M', 'T', 'N'], message: 'El turno debe ser M, T o N')]
     #[ORM\Column(length: 20)]
     private ?string $shift = null;
 
@@ -137,4 +160,6 @@ class Nurse
 
         return $this;
     }
+
+    
 }
